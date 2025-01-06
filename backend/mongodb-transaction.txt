@@ -1,0 +1,6 @@
+MongoDB에서 "Transaction numbers are only allowed on a replica set member or mongos" 오류는 트랜잭션 기능을 사용하려고 할 때 발생하며, 이는 MongoDB가 기본적으로 standalone 모드로 실행되기 때문입니다. 트랜잭션은 replica set 또는 sharded cluster 환경
+
+https://shiba-holic.tistory.com/68
+
+
+

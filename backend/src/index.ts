@@ -1,11 +1,11 @@
 import express, { NextFunction, Request, Response } from 'express';
+import mongoose from 'mongoose';
 //
 import { placesRouter } from './routes/places-routes';
 import { userRouter } from './routes/users-routes';
 import { HttpError } from './models/http-error';
 import { config } from './util/config';
 const app = express();
-const port = 5000;
 
 // 데이터 파싱
 app.use(express.json());
@@ -34,7 +34,16 @@ app.use((error: HttpError, req: Request, res: Response, next: NextFunction) => {
     }
 });
 
-app.listen(port, () => {
-    // console.log(`port: ${port}`);
-    // console.log(`api key : ${config.GOOGLE_API_KEY}`);
-});
+mongoose
+    .connect(config.MONGO_DB_URL, { dbName: config.MONGO_DB_NAME })
+    .then(() => {
+        console.log(`MONGO DB STARED, DB_NAME: ${config.MONGO_DB_NAME}`);
+
+        app.listen(config.PORT, () => {
+            console.log(`MERN APP STARTED`);
+            console.log(`port: ${config.PORT}`);
+        });
+    })
+    .catch((error) => {
+        console.log(error);
+    });
