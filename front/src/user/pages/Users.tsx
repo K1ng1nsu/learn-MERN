@@ -1,21 +1,40 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import UsersList from '../components/UserList';
 import { UserType } from '../UserType';
+import { ENV } from '../../shared/util/config';
+import ErrorModal from '../../shared/components/UIElements/ErrorModal';
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
+import { useHttpClient } from '../../shared/hooks/http-hook';
 
 type Props = {};
 
 const Users = (props: Props) => {
-    const USERS: Array<UserType> = [
-        {
-            id: 'u1',
-            name: 'insu',
-            image: 'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcT4is8rP6vgN2j1gBkrHpjZepJvJisJcdS9c5qjIzkeMZusSlpdY0xIEplzTvQZtJQksvL5ljEvnrXDD1Hk_dTgSM4xis4RiDWx6H5Baz8',
-            places: 3,
-        },
-    ];
+    const { isLoading, error, clearError, sendRequest } = useHttpClient();
+    const [loadedUsers, setLoadedUsers] = useState<UserType[]>([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const responseData = await sendRequest(`/api/users`);
+                setLoadedUsers(responseData.users);
+            } catch (err) {
+                //
+            }
+        };
+        fetchData();
+    }, [sendRequest]);
 
-    return <UsersList items={USERS} />;
+    return (
+        <>
+            <ErrorModal error={error} onClear={clearError} />
+            {isLoading && (
+                <div className="center">
+                    <LoadingSpinner />
+                </div>
+            )}
+            <UsersList items={loadedUsers!} />
+        </>
+    );
 };
 
 export default Users;

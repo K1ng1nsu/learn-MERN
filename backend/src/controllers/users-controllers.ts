@@ -63,7 +63,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     if (!identifiedUser) {
         return next(new HttpError('Could not identify user, credentials seem to be wrong', 401));
     } else {
-        res.json({ message: 'Logged in!' });
+        res.json({ message: 'Logged in!', user: identifiedUser.toObject({ getters: true }) });
     }
 };
 

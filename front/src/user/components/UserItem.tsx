@@ -7,7 +7,7 @@ import './UserItem.css';
 type Props = {
     id: string;
     name: string;
-    image: string;
+    image?: string;
     placeCount: number;
 };
 

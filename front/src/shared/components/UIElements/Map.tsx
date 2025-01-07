@@ -1,6 +1,7 @@
 import React, { CSSProperties, useEffect, useRef } from 'react';
 
 import './Map.css';
+import { ENV } from '../../util/config';
 
 type Props = {
     className: string;
@@ -17,9 +18,7 @@ const Map = (props: Props) => {
                 const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
                 if (!existingScript) {
                     const script = document.createElement('script');
-                    script.src = `https://maps.googleapis.com/maps/api/js?key=${
-                        import.meta.env.VITE_GOOGLE_API_KEY
-                    }&loading=async&libraries=marker&v=beta`;
+                    script.src = `https://maps.googleapis.com/maps/api/js?key=${ENV.VITE_GOOGLE_API_KEY}&loading=async&libraries=marker&v=beta`;
                     script.async = true;
                     script.defer = true;
                     script.onload = () => resolve();

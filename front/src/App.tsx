@@ -12,12 +12,15 @@ import { useCallback, useState } from 'react';
 
 const App = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userId, setUserId] = useState('');
 
-    const login = useCallback(() => {
+    const login = useCallback((uid: string) => {
         setIsLoggedIn(true);
+        setUserId(uid);
     }, []);
     const logout = useCallback(() => {
         setIsLoggedIn(false);
+        setUserId('');
     }, []);
 
     let routes;
@@ -44,7 +47,7 @@ const App = () => {
     }
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn: isLoggedIn, login: login, logout: logout }}>
+        <AuthContext.Provider value={{ isLoggedIn: isLoggedIn, userId: userId, login: login, logout: logout }}>
             <Router>
                 <MainNavigation />
                 <main>

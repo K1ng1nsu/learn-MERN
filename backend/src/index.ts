@@ -7,16 +7,28 @@ import { HttpError } from './models/http-error';
 import { config } from './util/config';
 const app = express();
 
-// 데이터 파싱
+// START 데이터 파싱
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// &데이터 파싱
+// END 데이터 파싱
 
+// Header 추가
+// CORS 설정
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authrization');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
+
+    next();
+});
+
+// START ROUTES
 // places routes     => /api/places/ ...
 app.use('/api/places', placesRouter);
 
 // users routes => /api/places/ ...
 app.use('/api/users', userRouter);
+// END ROUTES
 
 // notfound middle ware
 app.use((req, res, next) => {

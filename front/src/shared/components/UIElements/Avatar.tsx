@@ -5,7 +5,7 @@ import './Avatar.css';
 type Props = {
     className?: string;
     style?: string;
-    image: string;
+    image?: string;
     alt: string;
     width?: string;
     height?: string;
