@@ -10,8 +10,8 @@ import { useHttpClient } from '../../shared/hooks/http-hook';
 import { AuthContext } from '../../shared/context/auth-context';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
-import { ENV } from '../../shared/util/config';
 import { useNavigate } from 'react-router-dom';
+import ImageUpload from '../../shared/components/FormElements/ImageUpload';
 
 const NewPlace = () => {
     const { isLoading, error, clearError, sendRequest } = useHttpClient();
@@ -32,24 +32,26 @@ const NewPlace = () => {
                 value: '',
                 isValid: false,
             },
+            image: {
+                value: undefined,
+                isValid: false,
+            },
         },
         false
     );
 
     const placeSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        const formData = new FormData();
+        formData.append('title', formState.inputs['title'].value!);
+        formData.append('description', formState.inputs['description'].value!);
+        formData.append('address', formState.inputs['address'].value!);
+        formData.append('creator', auth.userId);
+        formData.append('image', formState.inputs['image'].value!);
+        console.log(formState.inputs);
+
         try {
-            await sendRequest(
-                `/api/places`,
-                'POST',
-                JSON.stringify({
-                    title: formState.inputs['title'].value,
-                    description: formState.inputs['description'].value,
-                    address: formState.inputs['address'].value,
-                    creator: auth.userId,
-                }),
-                { 'Content-Type': 'application/json' }
-            );
+            await sendRequest(`/api/places`, 'POST', formData);
             navigate(`/${auth.userId}/places`);
         } catch (err) {}
         // redirect the user to a diffrent page - if success
@@ -86,6 +88,7 @@ const NewPlace = () => {
                     errorText="Please enter a valid address."
                     onInput={inputHandler}
                 />
+                <ImageUpload errorText="이미지를 첨부해주세요." id="image" onInput={inputHandler} center />
                 <Button type="submit" disabled={!formState.isValid}>
                     ADD PLACE
                 </Button>

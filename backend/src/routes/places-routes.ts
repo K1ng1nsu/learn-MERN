@@ -1,6 +1,7 @@
 import express from 'express';
 import placeControllers from '../controllers/places-controllers';
 import { check } from 'express-validator';
+import { fileUpload } from '../middleware/file-upload';
 export const placesRouter = express.Router();
 
 placesRouter.get(
@@ -23,6 +24,7 @@ placesRouter.delete(
 
 placesRouter.post(
     '/',
+    fileUpload.single('image'),
     [check('title').not().isEmpty(), check('description').isLength({ min: 5 }), check('address').not().isEmpty()],
     placeControllers.createPlace as express.RequestHandler
 );

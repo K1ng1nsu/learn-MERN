@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
+import fs from 'fs';
 // my util
 import getCoordsForAddress from '../util/location';
 //model
@@ -76,7 +77,7 @@ const createPlace = async (req: Request, res: Response, next: NextFunction) => {
         description,
         location: coordinates,
         address,
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Empire_State_Building_%28aerial_view%29.jpg/399px-Empire_State_Building_%28aerial_view%29.jpg',
+        image: req.file?.path,
         creator,
     });
 
@@ -150,6 +151,8 @@ const deletePlaceByPlaceId = async (req: Request, res: Response, next: NextFunct
         return next(new HttpError('Could not find place', 404));
     }
 
+    const imagePath = place.image;
+
     try {
         const session = await mongoose.startSession();
         session.startTransaction();
@@ -158,6 +161,10 @@ const deletePlaceByPlaceId = async (req: Request, res: Response, next: NextFunct
         await place.creator.updateOne({ $pull: { places: place._id } }, { session });
 
         await session.commitTransaction();
+
+        fs.unlink(imagePath, (err) => {
+            console.log(err);
+        });
 
         res.json({ message: 'Deleted place.' });
     } catch (err) {

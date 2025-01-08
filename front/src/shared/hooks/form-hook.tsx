@@ -3,7 +3,7 @@ import { useCallback, useReducer } from 'react';
 type FormStateType = {
     inputs: {
         [key: string]: {
-            value?: string;
+            value?: string | Blob;
             isValid: boolean;
         };
     };
@@ -17,14 +17,14 @@ type InitialInputsType = {
     };
 };
 
-type InputHandlerType = (id: string, value: string, isValid: boolean) => void;
+type InputHandlerType = (id: string, value: string | Blob | undefined, isValid: boolean) => void;
 
 type FormActionType = {
     inputs?: InitialInputsType;
     type: 'INPUT_CHANGE' | 'SET_DATA';
     inputId?: string;
     isValid: boolean;
-    value?: string;
+    value?: string | Blob;
 };
 
 const formReducer = (state: FormStateType, action: FormActionType): FormStateType => {
@@ -71,7 +71,7 @@ export const useForm = (
         isValid: initialFormValidity,
     });
 
-    const inputHandler = useCallback((id: string, value: string, isValid: boolean) => {
+    const inputHandler = useCallback((id: string, value: string | Blob | undefined, isValid: boolean) => {
         dispatch({
             type: 'INPUT_CHANGE',
             value,
@@ -90,18 +90,3 @@ export const useForm = (
 
     return [formState, inputHandler, setFormData];
 };
-
-// {
-//     title: {
-//         value: '',
-//         isValid: false,
-//     },
-//     description: {
-//         value: '',
-//         isValid: false,
-//     },
-//     address: {
-//         value: '',
-//         isValid: false,
-//     },
-// }

@@ -1,5 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
+import fs from 'fs';
+import path from 'path';
 //
 import { placesRouter } from './routes/places-routes';
 import { userRouter } from './routes/users-routes';
@@ -11,6 +13,10 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // END 데이터 파싱
+
+// Image middleware
+app.use('/uploads/images', express.static(path.join('uploads', 'images')));
+// END Image middleware
 
 // Header 추가
 // CORS 설정
@@ -28,6 +34,7 @@ app.use('/api/places', placesRouter);
 
 // users routes => /api/places/ ...
 app.use('/api/users', userRouter);
+
 // END ROUTES
 
 // notfound middle ware
@@ -37,6 +44,11 @@ app.use((req, res, next) => {
 });
 
 app.use((error: HttpError, req: Request, res: Response, next: NextFunction) => {
+    if (req.file) {
+        fs.unlink(req.file.path, (err) => {
+            console.log(err);
+        });
+    }
     // console.log(error.stack);
     if (res.headersSent) {
         return next(error);

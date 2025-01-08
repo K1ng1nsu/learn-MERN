@@ -11,6 +11,7 @@ import { ENV } from '../../shared/util/config';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import { useHttpClient } from '../../shared/hooks/http-hook';
+import ImageUpload from '../../shared/components/FormElements/ImageUpload';
 
 type Props = {};
 
@@ -44,6 +45,10 @@ const Auth = (props: Props) => {
                         value: undefined,
                         isValid: true,
                     },
+                    image: {
+                        value: undefined,
+                        isValid: true,
+                    },
                 },
                 formState.inputs['email'].isValid && formState.inputs['password'].isValid
             );
@@ -56,6 +61,10 @@ const Auth = (props: Props) => {
                         value: '',
                         isValid: false,
                     },
+                    image: {
+                        value: undefined,
+                        isValid: false,
+                    },
                 },
                 false
             );
@@ -65,6 +74,9 @@ const Auth = (props: Props) => {
 
     const authSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        console.log(formState.inputs);
+
         if (isLoginMode) {
             //try login
             try {
@@ -84,18 +96,12 @@ const Auth = (props: Props) => {
         } else {
             //try sign up
             try {
-                const responseData = await sendRequest(
-                    `/api/users/signup`,
-                    'POST',
-                    JSON.stringify({
-                        name: formState.inputs['name'].value,
-                        email: formState.inputs['email'].value,
-                        password: formState.inputs['password'].value,
-                    }),
-                    {
-                        'Content-Type': 'application/json',
-                    }
-                );
+                const formData = new FormData();
+                formData.append('email', formState.inputs['email'].value!);
+                formData.append('name', formState.inputs['name'].value!);
+                formData.append('password', formState.inputs['password'].value!);
+                formData.append('image', formState.inputs['image'].value!);
+                const responseData = await sendRequest(`/api/users/signup`, 'POST', formData);
                 auth.login(responseData.user.id);
             } catch (err) {
                 //이미에러처리함
@@ -123,6 +129,9 @@ const Auth = (props: Props) => {
                             errorText="Please enter a name"
                             onInput={inputHandler}
                         />
+                    )}
+                    {!isLoginMode && (
+                        <ImageUpload errorText="이미지를 첨부해주세요." onInput={inputHandler} id="image" center />
                     )}
                     <Input
                         id="email"
