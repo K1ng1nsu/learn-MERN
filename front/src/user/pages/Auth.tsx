@@ -89,7 +89,7 @@ const Auth = (props: Props) => {
                     }),
                     { 'Content-Type': 'application/json' }
                 );
-                auth.login(responseData.user.id);
+                auth.login(responseData.user.userId, responseData.token);
             } catch (err) {
                 //이미에러처리함
             }
@@ -102,7 +102,7 @@ const Auth = (props: Props) => {
                 formData.append('password', formState.inputs['password'].value!);
                 formData.append('image', formState.inputs['image'].value!);
                 const responseData = await sendRequest(`/api/users/signup`, 'POST', formData);
-                auth.login(responseData.user.id);
+                auth.login(responseData.user.userId, responseData.token);
             } catch (err) {
                 //이미에러처리함
             }

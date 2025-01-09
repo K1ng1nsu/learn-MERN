@@ -8,24 +8,14 @@ import './App.css';
 import Auth from './user/pages/Auth';
 
 import { AuthContext } from './shared/context/auth-context';
-import { useCallback, useState } from 'react';
+import useAuth from './shared/hooks/auth-hook';
 
 const App = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userId, setUserId] = useState('');
-
-    const login = useCallback((uid: string) => {
-        setIsLoggedIn(true);
-        setUserId(uid);
-    }, []);
-    const logout = useCallback(() => {
-        setIsLoggedIn(false);
-        setUserId('');
-    }, []);
+    const { login, logout, token, userId } = useAuth();
 
     let routes;
 
-    if (isLoggedIn) {
+    if (token) {
         routes = (
             <>
                 <Route path="/" Component={Users} />
@@ -47,7 +37,9 @@ const App = () => {
     }
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn: isLoggedIn, userId: userId, login: login, logout: logout }}>
+        <AuthContext.Provider
+            value={{ isLoggedIn: !!token, userId: userId, login: login, logout: logout, token: token }}
+        >
             <Router>
                 <MainNavigation />
                 <main>

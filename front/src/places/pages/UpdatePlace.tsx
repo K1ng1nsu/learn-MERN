@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PlaceType } from '../PlacesType';
 import Input from '../../shared/components/FormElements/Input';
@@ -11,10 +11,12 @@ import Card from '../../shared/components/UIElements/Card';
 import { useHttpClient } from '../../shared/hooks/http-hook';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
+import { AuthContext } from '../../shared/context/auth-context';
 
 type Props = {};
 
 const UpdatePlace = (props: Props) => {
+    const auth = useContext(AuthContext);
     const navigate = useNavigate();
     const [loadedPlace, setLoadedPlace] = useState();
     const [formState, inputHandler, setFormData] = useForm(
@@ -68,7 +70,7 @@ const UpdatePlace = (props: Props) => {
                     title: formState.inputs['title'].value,
                     description: formState.inputs['description'].value,
                 }),
-                { 'Content-Type': 'application/json' }
+                { 'Content-Type': 'application/json', Authorization: 'Bearer ' + auth.token }
             );
 
             console.log(responseData);

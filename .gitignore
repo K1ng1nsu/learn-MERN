@@ -130,6 +130,9 @@ dist
 .pnp.*
 
 
+*.jpg
+*.jpeg
+*.png
 .jpg
 .jpeg
 .png

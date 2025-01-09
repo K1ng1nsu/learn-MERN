@@ -59,7 +59,9 @@ const createPlace = async (req: Request, res: Response, next: NextFunction) => {
         return next(new HttpError('Invalid inputs passed, please check your data.', 400));
     }
 
-    const { title, description, address, creator } = req.body;
+    const { title, description, address } = req.body;
+
+    const creator = req.userData?.userId;
 
     let coordinates: {
         lat: number;
@@ -103,6 +105,8 @@ const createPlace = async (req: Request, res: Response, next: NextFunction) => {
 
         await session.commitTransaction();
     } catch (err) {
+        console.log(err);
+
         const error = new HttpError('Creating place failed, please try again-2', 500);
         return next(error);
     }
@@ -119,26 +123,33 @@ const updatePlaceByPlaceId = async (req: Request, res: Response, next: NextFunct
     const placeId = req.params.pid;
     const { title, description } = req.body;
 
+    const userId = req.userData?.userId;
+
     let updatedPlace;
     try {
-        updatedPlace = await Place.findByIdAndUpdate(
-            placeId,
-            { $set: { title, description } },
-            { new: true, runValidators: true }
-        );
+        updatedPlace = await Place.findById(placeId);
+
+        if (!updatedPlace) {
+            return next(new HttpError('Somethin went wrong, please try again -1', 500));
+        }
+
+        if (updatedPlace.creator.id.toString() !== userId) {
+            return next(new HttpError('Somethin went wrong, please try again -2', 500));
+        }
+        updatedPlace.title = title;
+        updatedPlace.description = description;
+        await updatedPlace.save();
     } catch (err) {
-        return next(new HttpError('Somethin went wrong, please try again', 500));
+        return next(new HttpError('Somethin went wrong, please try again -3', 500));
     }
 
-    if (!updatedPlace) {
-        return next(new HttpError('Could not find place', 404));
-    }
-
-    res.json({ place: updatedPlace.toObject({ getters: true }) });
+    res.json({ place: { creator: userId } });
 };
 
 const deletePlaceByPlaceId = async (req: Request, res: Response, next: NextFunction) => {
     const placeId = req.params.pid;
+
+    const userId = req.userData?.userId;
 
     let place;
     try {
@@ -149,6 +160,10 @@ const deletePlaceByPlaceId = async (req: Request, res: Response, next: NextFunct
 
     if (!place) {
         return next(new HttpError('Could not find place', 404));
+    }
+
+    if (place.creator.id !== userId!) {
+        return next(new HttpError('Something went wrong, could not delete place - 2', 500));
     }
 
     const imagePath = place.image;

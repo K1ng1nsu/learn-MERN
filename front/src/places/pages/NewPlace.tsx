@@ -51,7 +51,9 @@ const NewPlace = () => {
         console.log(formState.inputs);
 
         try {
-            await sendRequest(`/api/places`, 'POST', formData);
+            await sendRequest(`/api/places`, 'POST', formData, {
+                Authorization: 'Bearer ' + auth.token,
+            });
             navigate(`/${auth.userId}/places`);
         } catch (err) {}
         // redirect the user to a diffrent page - if success
